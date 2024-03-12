@@ -24,7 +24,7 @@ Se tudo ocorreu certo, deve aparecer (venv) escrito no seu terminal, isso mostra
 que você está dentro do ambiente da venv
 
 **3º Instalar as bibliotecas necessárias**
-`pip install requirements`
+`pip install -r requirements`
 
 **4º (Opcional) Configure sua IDE para executar a main.py e utilizar a venv**
 
