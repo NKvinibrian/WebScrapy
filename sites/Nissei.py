@@ -2,6 +2,8 @@ from SiteMapScraping import WebSrap
 import re
 import asyncio
 import requests
+import aiohttp
+import datetime
 
 
 class Nissei(WebSrap):
@@ -12,19 +14,57 @@ class Nissei(WebSrap):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0'
         }
 
+    # async def pegar_preco(self, codigo):
+    #     s = requests.session()
+    #     url = self.url + '/pegar/preco'
+    #     s.get(self.url)
+    #
+    #     headers = {
+    #         'Referer': url,
+    #         'X-CSRFToken': s.cookies.get('csrftoken'), }
+    #
+    #     payload = {'produtos_ids[]': codigo}
+    #
+    #     response = s.request("POST", url, headers=headers, data=payload)
+    #     result = re.findall(r'\"valor_fim\": \"(.*?)\",', response.text)
+    #     value = 0
+    #     if result:
+    #         value = float(result[0])
+    #         for item in result:
+    #             item = float(item)
+    #             if item < value:
+    #                 value = item
+    #     return value
+
+    @staticmethod
+    async def get_cookies(url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                cookies = response.cookies
+                return cookies
+
+    @staticmethod
+    async def post_request(url, cookies, data, headers):
+        form_data = aiohttp.FormData()
+        for key, value in data.items():
+            form_data.add_field(key, value)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, data=form_data, cookies=cookies, headers=headers) as response:
+                return await response.text()
+
     async def pegar_preco(self, codigo):
-        s = requests.session()
         url = self.url + '/pegar/preco'
-        s.get(self.url)
+        cookies = await self.get_cookies(self.url)
 
         headers = {
             'Referer': url,
-            'X-CSRFToken': s.cookies.get('csrftoken'), }
+            'X-CSRFToken': cookies.get('csrftoken').value, }
 
         payload = {'produtos_ids[]': codigo}
 
-        response = s.request("POST", url, headers=headers, data=payload)
-        result = re.findall(r'\"valor_fim\": \"(.*?)\",', response.text)
+        response = await self.post_request(url=url, headers=headers, data=payload, cookies=cookies)
+        result = re.findall(r'\"valor_fim\": \"(.*?)\",', response)
         value = 0
         if result:
             value = float(result[0])
@@ -34,6 +74,27 @@ class Nissei(WebSrap):
                     value = item
         return value
 
+    # async def pegar_preco(self, codigo):
+    #     s = requests.session()
+    #     url = self.url + '/pegar/preco'
+    #     s.get(self.url)
+    #
+    #     headers = {
+    #         'Referer': url,
+    #         'X-CSRFToken': s.cookies.get('csrftoken'), }
+    #
+    #     payload = {'produtos_ids[]': codigo}
+    #
+    #     response = s.request("POST", url, headers=headers, data=payload)
+    #     result = re.findall(r'\"valor_fim\": \"(.*?)\",', response.text)
+    #     value = 0
+    #     if result:
+    #         value = float(result[0])
+    #         for item in result:
+    #             item = float(item)
+    #             if item < value:
+    #                 value = item
+    #     return value
 
     async def scraping(self, url: str):
         print('Iniciando: {}'.format(url))
@@ -46,7 +107,7 @@ class Nissei(WebSrap):
         }
 
         pattern = r"<span class=\"mr-3\">(.*?)</span>"
-        result = re.findall(pattern, response.text)
+        result = re.findall(pattern, response)
         result = result[0] if result else None
         if result is None:
             print('{} EAN não encontrado em {}'.format(self.name, url))
@@ -61,7 +122,7 @@ class Nissei(WebSrap):
             return
 
         pattern = r"<span class=\"ml-3\">(.*?)</span>"
-        result = re.findall(pattern, response.text)
+        result = re.findall(pattern, response)
         result = result[0] if result else None
         result = re.findall(r"\d+", result)
         result = result[0] if result else None
@@ -69,7 +130,7 @@ class Nissei(WebSrap):
         if codigo:
             data['value'] = await self.pegar_preco(codigo)
 
-        result = response.text.strip().replace('\n', '').replace('\r', '')
+        result = response.strip().replace('\n', '').replace('\r', '')
         pattern = r'<h1 data-target=\"nome_produto\" style=\"font-size: 25px !important;\" class=\"font-weight-bold text-extradark-grey\">(.*?)</h1>'
         result = re.findall(pattern, result)
         result = result[0] if result else None
@@ -79,11 +140,19 @@ class Nissei(WebSrap):
 
     async def __asyc_run(self):
         list_url = self.get_all_url_products()
-        tasks = [asyncio.create_task(self.scraping(item)) for item in list_url]
-        done, padding = await asyncio.wait(tasks)
+        lista_separada = []
+        tamanho_sublista = 1000
+        for i in range(0, len(list_url), tamanho_sublista):
+            lista_separada.append(list_url[i:i + tamanho_sublista])
+        for i in lista_separada:
+            tasks = [asyncio.create_task(self.scraping(item)) for item in i]
+            done, padding = await asyncio.wait(tasks)
 
     def run(self):
+        dat_init = datetime.datetime.now()
+        print('Iniciado Scraping em: {}'.format(dat_init))
         asyncio.run(self.__asyc_run())
-        print('Finalizado')
+        print('Finalizado em {}'.format(datetime.datetime.now()))
+        print('Total de tempo {}'.format(datetime.datetime.now() - dat_init))
 
 

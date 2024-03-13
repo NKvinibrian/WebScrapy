@@ -2,6 +2,7 @@ import requests
 import re
 import DataBaseControl
 import Models
+import aiohttp
 from typing import List
 from sqlalchemy import create_engine
 
@@ -26,8 +27,22 @@ class WebSrap:
             raise ConnectionRefusedError('A conexão foi recusada pelo host')
         return response
 
+    # @staticmethod
+    # async def async_request_get(url: str, headers: dict = None) -> requests.Response:
+    #     """
+    #     Função Asincrona para realizar o request e tratar os status code
+    #     :param: url -> str
+    #     :return: class requisição -> obj
+    #     """
+    #     if headers is None:
+    #         headers = {}
+    #     response = requests.get(url, headers=headers)
+    #     if response.status_code not in [200, 201, 202, 203, 204]:
+    #         raise ConnectionRefusedError('A conexão foi recusada pelo host')
+    #     return response
+
     @staticmethod
-    async def async_request_get(url: str, headers: dict = None) -> requests.Response:
+    async def async_request_get(url: str, headers: dict = None) -> aiohttp.ClientSession.get:
         """
         Função Asincrona para realizar o request e tratar os status code
         :param: url -> str
@@ -35,10 +50,11 @@ class WebSrap:
         """
         if headers is None:
             headers = {}
-        response = requests.get(url, headers=headers)
-        if response.status_code not in [200, 201, 202, 203, 204]:
-            raise ConnectionRefusedError('A conexão foi recusada pelo host')
-        return response
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url, headers=headers) as response:
+                if response.status not in [200, 201, 202, 203, 204]:
+                    raise ConnectionRefusedError('A conexão foi recusada pelo host')
+                return await response.text()
 
     @staticmethod
     def __get_loc_content(data: str) -> List[str]:
