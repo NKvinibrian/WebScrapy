@@ -27,20 +27,6 @@ class WebSrap:
             raise ConnectionRefusedError('A conexão foi recusada pelo host')
         return response
 
-    # @staticmethod
-    # async def async_request_get(url: str, headers: dict = None) -> requests.Response:
-    #     """
-    #     Função Asincrona para realizar o request e tratar os status code
-    #     :param: url -> str
-    #     :return: class requisição -> obj
-    #     """
-    #     if headers is None:
-    #         headers = {}
-    #     response = requests.get(url, headers=headers)
-    #     if response.status_code not in [200, 201, 202, 203, 204]:
-    #         raise ConnectionRefusedError('A conexão foi recusada pelo host')
-    #     return response
-
     @staticmethod
     async def async_request_get(url: str, headers: dict = None) -> aiohttp.ClientSession.get:
         """
