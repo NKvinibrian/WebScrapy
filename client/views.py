@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.conf import settings
+from http import HTTPStatus
 
 # Create your views here.
 
@@ -22,7 +23,7 @@ class LoginView(View):
             bo_login.LoginControl(username=username, password=password).authenticate_user(request=request)
             return JsonResponse('', safe=False)
         except ValidationError as e:
-            return JsonResponse(e, safe=False)
+            return JsonResponse(data='', safe=False, status=HTTPStatus.FORBIDDEN)
 
 
 # class LogoffView(LoginView):
