@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   deploy:
-    name: Deploy to EC2
+    name: Deploy to EC2 web
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the files
