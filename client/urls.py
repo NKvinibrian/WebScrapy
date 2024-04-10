@@ -1,8 +1,9 @@
 from django.urls import path, include
-from client.views import LoginView
+from client.views import LoginView, DashboardView, LogoffView
 
 urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
+    path('logoff', LogoffView.as_view(), name='logoff'),
     # path('register', include('client.urls')),
-    # path('dashboard', include('client.urls'))
+    path('dashboard', DashboardView.as_view(), name='dashboard')
 ]

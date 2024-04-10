@@ -1,10 +1,10 @@
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
-
+from django.contrib.auth import authenticate, login, logout
+from django.core.exceptions import ValidationError
 
 class LoginControl:
 
-    def __init__(self, username, password, email):
+    def __init__(self, username, password, email=None):
         self.username = username
         self.email = email
         self.__password = password
@@ -13,9 +13,13 @@ class LoginControl:
         user = User.objects.create_user(self.username, self.email, self.__password)
         user.save()
 
-    def authenticate_user(self):
-        user = authenticate(self.username, self.__password)
-        if user is not None:
-            return user
+    def authenticate_user(self, request):
+        user = authenticate(username=self.username, password=self.__password)
+        if user:
+            login(request=request, user=user)
         else:
-            return None
+            raise ValidationError("Usuario ou senha invalido")
+
+    @staticmethod
+    def logoff_user(request):
+        logout(request)

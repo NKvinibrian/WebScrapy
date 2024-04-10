@@ -19,19 +19,57 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div class="container-sm form-container">
-        <form>
+    <div class="container-sm form-container flex-column">
+        {% csrf_token %}
+        <div class="notfication">
+        </div>
+        <form id="login-form">
             <div class="mb-2">
-                <label for="exampleInputEmail1" class="form-label">Usuario:</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <label for="username" class="form-label">Usuário:</label>
+                <input type="text" class="form-control" id="username" aria-describedby="usernameHelp" required>
             </div>
             <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Senha:</label>
-                <input type="password" class="form-control" id="exampleInputPassword1">
+                <label for="password" class="form-label">Senha:</label>
+                <input type="password" class="form-control" id="password" required>
             </div>
             <div class="text-center">
-            <button type="submit" class="btn btn-primary mx-auto">Entrar</button>
+                <button type="submit" class="btn btn-primary mx-auto">Entrar</button>
             </div>
         </form>
     </div>
+    <script>
+        $(document).ready(function () {
+            $('#login-form').submit(function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                var username = $('#username').val();
+                var password = $('#password').val();
+
+                // Perform form validation here (optional)
+
+                $.ajax({
+                    url: "/login", // Replace with your actual login URL
+                    type: "POST", // Use POST for login requests
+                    data: {
+                        username: username,
+                        password: password,
+                        csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val()
+                    },
+                    success: function (response) {
+                        // Handle successful login response (e.g., redirect to dashboard)
+                        console.log("Login successful:", response);
+                        window.location.href = "{% url 'dashboard' %}";
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // Handle login errors (e.g., display error message)
+                        $(".alert").alert('close');
+                        $(".notfication").append('<div class=\"alert alert-danger\" role=\"alert\"> Usuario ou senha inválido! </div>');
+                        console.error("Login failed:", textStatus, errorThrown);
+
+                        {#alert("Login failed. Please check your credentials."); // Example error message#}
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}
