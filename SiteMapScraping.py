@@ -51,7 +51,7 @@ class WebSrap:
         """
         return re.findall(r"<loc>(.*)</loc>", data)
 
-    def get_site_map(self) -> str:
+    def get_sitemap(self) -> str:
         """
         Função para pegar a url do sitemap
         :return: url -> str
@@ -64,7 +64,7 @@ class WebSrap:
         Função para carregar o sitemap
         :return: Lista de urls -> List[str]
         """
-        url: str = self.get_site_map()
+        url: str = self.get_sitemap()
         if url.find('https://') == -1:
             url = 'https://' + url
         return self.request_get(url)
