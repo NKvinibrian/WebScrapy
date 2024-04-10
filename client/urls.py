@@ -5,5 +5,5 @@ urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
     path('logoff', LogoffView.as_view(), name='logoff'),
     # path('register', include('client.urls')),
-    path('dashboard', DashboardView.as_view(), name='dashboard')
+    path('', DashboardView.as_view(), name='dashboard')
 ]
