@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block head %}
+    <title>Login</title>
+    <style>
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* optional: set minimum height for vertical centering */
+        }
+
+        .form-container form {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+        }
+
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-sm form-container">
+        <form>
+            <div class="mb-2">
+                <label for="exampleInputEmail1" class="form-label">Usuario:</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Senha:</label>
+                <input type="password" class="form-control" id="exampleInputPassword1">
+            </div>
+            <div class="text-center">
+            <button type="submit" class="btn btn-primary mx-auto">Entrar</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
