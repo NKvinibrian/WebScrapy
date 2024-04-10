@@ -5,6 +5,7 @@ import dashboard_bo.login_control as bo_login
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.conf import settings
 
 # Create your views here.
 
@@ -24,11 +25,18 @@ class LoginView(View):
             return JsonResponse(e, safe=False)
 
 
-class LogoffView(LoginView):
+# class LogoffView(LoginView):
+#
+#     def dispatch(self, request, *args, **kwargs):
+#         response = super().dispatch(request, *args, **kwargs)
+#         return response
 
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        return response
+
+class LogoffView(View):
+
+    def get(self, request, *args, **kwargs):
+        bo_login.LoginControl.logoff_user(request=request)
+        return redirect(settings.LOGIN_URL)
 
 
 class DashboardView(View):
