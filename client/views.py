@@ -8,40 +8,65 @@ from django.utils.decorators import method_decorator
 from django.conf import settings
 from http import HTTPStatus
 
-# Create your views here.
-
 
 class LoginView(View):
-
+    """
+    Essa clase é responsavel pelo login/auth do usuario
+    """
     def get(self, request, *args, **kwargs):
+        """
+        Requisição get
+        :param request: dados da requisição
+        :param args: parametros extras
+        :param kwargs: parametros extras
+        :return: Render da pagina login HTML
+        """
         return render(request=request, template_name='login.html')
 
     def post(self, request, *args, **kwargs):
+        """
+        Requisição post
+        :param request: dados da requisição
+        :param args: parametros extras
+        :param kwargs: parametros extras
+        :return: Json response com status do login
+        """
         username = request.POST.get('username')
         password = request.POST.get('password')
         try:
             bo_login.LoginControl(username=username, password=password).authenticate_user(request=request)
             return JsonResponse('', safe=False)
-        except ValidationError as e:
+        except ValidationError:
             return JsonResponse(data='', safe=False, status=HTTPStatus.FORBIDDEN)
 
 
-# class LogoffView(LoginView):
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         response = super().dispatch(request, *args, **kwargs)
-#         return response
-
-
 class LogoffView(View):
-
+    """
+    Essa class é responsavel pelo Logoff do usuario
+    """
     def get(self, request, *args, **kwargs):
+        """
+        Requisição get
+        :param request: dados da requisição
+        :param args: parametros extras
+        :param kwargs: parametros extras
+        :return: Redirect para pagina de login
+        """
         bo_login.LoginControl.logoff_user(request=request)
         return redirect(settings.LOGIN_URL)
 
 
 class DashboardView(View):
-
+    """
+    Essa classe é responsavel pela pagina principal do sistema
+    """
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
+        """
+        Requisição get
+        :param request: dados da requisição
+        :param args: parametros extras
+        :param kwargs: parametros extras
+        :return: Render da pagina dashboard  HTML
+        """
         return render(request=request, template_name='dashboard.html')
