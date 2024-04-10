@@ -32,15 +32,15 @@ on:
 
 env:
   AWS_REGION: us-east-1d                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
-  ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
+  ECR_REPOSITORY: webscrapy           # set this to your Amazon ECR repository name
+  ECS_SERVICE: webscrapy                 # set this to your Amazon ECS service name
+  ECS_CLUSTER: webscrapy                 # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: .github/workflow/task-definition.json    # set this to the path to your Amazon ECS task definition
+  CONTAINER_NAME: webscrapy           # set this to the name of the container in the
+
 
 permissions:
+  id-token: write
   contents: read
 
 jobs:
