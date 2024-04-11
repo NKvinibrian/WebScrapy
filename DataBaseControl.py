@@ -16,7 +16,8 @@ class ControlMetaData(type):
 class Control(metaclass=ControlMetaData):
 
     def __init__(self):
-        self.engine = create_engine('sqlite:///database.db')
+        DATABASE_URL = 'postgresql://default:YET1NouGyxK5@ep-fragrant-mud-a4igk9fg-pooler.us-east-1.aws.neon.tech/verceldb'
+        self.engine = create_engine(DATABASE_URL)
 
     def create_all_tables(self):
         base = Models.Base
