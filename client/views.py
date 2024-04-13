@@ -1,12 +1,16 @@
+import copy
+import json
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views import View
 import dashboard_bo.login_control as bo_login
+import dashboard_bo.produto as bo_produto
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.conf import settings
 from http import HTTPStatus
+from django.views.decorators.csrf import csrf_exempt
 
 
 class LoginView(View):
@@ -70,3 +74,59 @@ class DashboardView(View):
         :return: Render da pagina dashboard  HTML
         """
         return render(request=request, template_name='dashboard.html')
+
+
+class WebScrapView(View):
+    """
+    Essa class é responsavel pelo render do webScrap Page
+    """
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        """
+        Requisição get
+        :param request: dados da requisição
+        :param args: parametros extras
+        :param kwargs: parametros extras
+        :return: Render page
+        """
+        return render(request=request, template_name='content-webscrap.html')
+
+
+class ProdutoView(View):
+    """
+    Essa class é responsavel pelo render do Produtos page
+    """
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        """
+        Requisição get
+        :param request: dados da requisição
+        :param args: parametros extras
+        :param kwargs: parametros extras
+        :return: Render page
+        """
+        return render(request=request, template_name='content-produto.html')
+
+
+class AjaxProdutosView(View):
+    """
+    Essa class é responsavel pelo json do Produtos page
+    """
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        """
+        Requisição get
+        :param request: dados da requisição
+        :param args: parametros extras
+        :param kwargs: parametros extras
+        :return: Render page
+        """
+        context = bo_produto.Produto.get_all_products_filtered()
+        return JsonResponse(context, safe=False)
+
+    @csrf_exempt
+    def post(self, request, *args, **kwargs):
+        content = copy.deepcopy(request.POST)
+        del content['csrfmiddlewaretoken']
+        bo_produto.Produto().set_product(content)
+        return JsonResponse('', safe=False)

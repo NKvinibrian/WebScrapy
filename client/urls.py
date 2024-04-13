@@ -1,9 +1,14 @@
-from django.urls import path, include
-from client.views import LoginView, DashboardView, LogoffView
+from django.urls import path
+from client.views import *
 
 urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
     path('logoff', LogoffView.as_view(), name='logoff'),
-    # path('register', include('client.urls')),
+
+    path('web-scrap', WebScrapView.as_view(), name='web_scrap'),
+
+    path('produtos', ProdutoView.as_view(), name='produtos'),
+    path('ajax-produtos', AjaxProdutosView.as_view(), name='ajax_produtos'),
+
     path('', DashboardView.as_view(), name='dashboard')
 ]
