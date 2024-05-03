@@ -1,7 +1,10 @@
 <div class="d-flex mx-auto p-2 justify-content-center" style="width: 90%">
     <form class="d-flex form-inline my-2 my-lg-2 flex-row">
-        <input class="form-control mr-4 mx-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <input id="search_field" class="form-control mr-4 mx-2" type="search" placeholder="Search" aria-label="Search">
+        <ul id="search_result" class="dropdown-menu mx-2 text-small shadow show" style="transform: translate(0px, 38px);" data-popper-placement="top-start">
+            <li><a class="dropdown-item" href="#">Configuração</a></li>
+            <li><a class="dropdown-item" href="/logoff">Sair</a></li>
+        </ul>
     </form>
 </div>
 
@@ -139,6 +142,61 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
         integrity="sha512-CQBWl4fJHWbryGE+Pc7UAxWMUMNMWzWxF4SQo9CgkJIN1kx6djDQZjh3Y8SZ1d+6I+1zze6Z7kHXO7q3UyZAWw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    let search = $("#search_field")
+    let result = $("#search_result")
+    result.hide()
+
+    let typingTimer;
+    let doneTypingInterval = 500; // Tempo em milissegundos (0.5 segundos)
+
+    // Função para realizar a pesquisa
+    function doSearch() {
+        // Pega o valor digitado no campo de pesquisa
+        let query = search.val();
+
+        // Realiza a pesquisa somente se houver texto digitado
+        if (query.trim() !== '') {
+            // Aqui você pode realizar uma solicitação AJAX para o seu servidor para obter os resultados do banco de dados
+            // Por enquanto, vamos apenas exibir a consulta digitada
+            result.empty()
+            searchAjax();
+            result.show();
+        } else {
+            // Se o campo de pesquisa estiver vazio, limpe os resultados
+            result.empty();
+            result.hide();
+        }
+    }
+
+    function searchAjax() {
+        $.ajax({
+            url: "{% url 'ajax_pesquisa' %}",
+            type: "GET",
+            data: {search: search.val()},
+            success: function (response) {
+                response.forEach(
+                    data => result.append('<li><a class="dropdown-item" href="#">'+ data.ean + " - " + data.name + '</a></li>')
+                );
+                console.log(response);
+            }
+        });
+    }
+
+    // Evento de teclado
+    search.keyup(function() {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(doSearch, doneTypingInterval);
+    });
+
+    // Evento para cancelar a pesquisa se o usuário começar a digitar novamente antes do tempo de espera
+    search.keydown(function() {
+        clearTimeout(typingTimer);
+    });
+
+</script>
+
 <script>
     (function () {
         'use strict'

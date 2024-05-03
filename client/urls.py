@@ -10,5 +10,7 @@ urlpatterns = [
     path('produtos', ProdutoView.as_view(), name='produtos'),
     path('ajax-produtos', AjaxProdutosView.as_view(), name='ajax_produtos'),
 
+    path('pesquisa', AjaxPesquisaView.as_view(), name='ajax_pesquisa'),
+
     path('', DashboardView.as_view(), name='dashboard')
 ]

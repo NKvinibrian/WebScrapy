@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 engine = create_engine('sqlite:///mydatabase.db')
 
 
-class WebSrap:
+class WebScrap:
 
     def __init__(self, url: str, name: str):
         self.url: str = url

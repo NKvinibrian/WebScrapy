@@ -1,10 +1,10 @@
 import copy
-import json
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views import View
 import dashboard_bo.login_control as bo_login
 import dashboard_bo.produto as bo_produto
+import dashboard_bo.search as bo_search
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -130,3 +130,12 @@ class AjaxProdutosView(View):
         del content['csrfmiddlewaretoken']
         bo_produto.Produto().set_product(content)
         return JsonResponse('', safe=False)
+
+
+class AjaxPesquisaView(View):
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        request_filter = request.GET.get('search')
+        context = bo_search.SearchProduct.search_ean_product(request_filter)
+        return JsonResponse(context, safe=False)

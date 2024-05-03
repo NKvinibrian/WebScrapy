@@ -1,4 +1,4 @@
-from SiteMapScraping import WebSrap
+from SiteMapScraping import WebScrap
 import re
 import asyncio
 import requests
@@ -6,35 +6,13 @@ import aiohttp
 import datetime
 
 
-class Nissei(WebSrap):
+class Nissei(WebScrap):
     
     def __init__(self):
         super().__init__('https://www.farmaciasnissei.com.br', 'Nissei')
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0'
         }
-
-    # async def pegar_preco(self, codigo):
-    #     s = requests.session()
-    #     url = self.url + '/pegar/preco'
-    #     s.get(self.url)
-    #
-    #     headers = {
-    #         'Referer': url,
-    #         'X-CSRFToken': s.cookies.get('csrftoken'), }
-    #
-    #     payload = {'produtos_ids[]': codigo}
-    #
-    #     response = s.request("POST", url, headers=headers, data=payload)
-    #     result = re.findall(r'\"valor_fim\": \"(.*?)\",', response.text)
-    #     value = 0
-    #     if result:
-    #         value = float(result[0])
-    #         for item in result:
-    #             item = float(item)
-    #             if item < value:
-    #                 value = item
-    #     return value
 
     @staticmethod
     async def get_cookies(url):
@@ -73,28 +51,6 @@ class Nissei(WebSrap):
                 if item < value:
                     value = item
         return value
-
-    # async def pegar_preco(self, codigo):
-    #     s = requests.session()
-    #     url = self.url + '/pegar/preco'
-    #     s.get(self.url)
-    #
-    #     headers = {
-    #         'Referer': url,
-    #         'X-CSRFToken': s.cookies.get('csrftoken'), }
-    #
-    #     payload = {'produtos_ids[]': codigo}
-    #
-    #     response = s.request("POST", url, headers=headers, data=payload)
-    #     result = re.findall(r'\"valor_fim\": \"(.*?)\",', response.text)
-    #     value = 0
-    #     if result:
-    #         value = float(result[0])
-    #         for item in result:
-    #             item = float(item)
-    #             if item < value:
-    #                 value = item
-    #     return value
 
     async def scraping(self, url: str):
         print('Iniciando: {}'.format(url))
