@@ -1,11 +1,12 @@
-<div class="d-flex mx-auto p-2 justify-content-center" style="width: 90%">
-    <form class="d-flex form-inline my-2 my-lg-2 flex-row">
+<div class="d-flex dropdown-center mx-auto p-2 justify-content-center" style="width: 90%">
+    <form class="d-flex form-inline my-2 my-lg-2 flex-row" style="width: 400px">
         <input id="search_field" class="form-control mr-4 mx-2" type="search" placeholder="Search" aria-label="Search">
-        <ul id="search_result" class="dropdown-menu mx-2 text-small shadow show" style="transform: translate(0px, 38px);" data-popper-placement="top-start">
-            <li><a class="dropdown-item" href="#">Configuração</a></li>
-            <li><a class="dropdown-item" href="/logoff">Sair</a></li>
-        </ul>
     </form>
+    <ul id="search_result" class="dropdown-menu mx-2 text-small shadow show" style="transform: translate(0px, 46px);"
+        data-popper-placement="top-start">
+        <li><a class="dropdown-item" href="#">Configuração</a></li>
+        <li><a class="dropdown-item" href="/logoff">Sair</a></li>
+    </ul>
 </div>
 
 <canvas class="my-4 px-4 w-100 chartjs-render-monitor" id="myChart" width="1500" height="633"
@@ -177,22 +178,34 @@
             data: {search: search.val()},
             success: function (response) {
                 response.forEach(
-                    data => result.append('<li><a class="dropdown-item" href="#">'+ data.ean + " - " + data.name + '</a></li>')
+                    data => result.append('<li><a class="dropdown-item search-item-result">' + data.ean + " - " + data.name + '</a></li>')
                 );
-                console.log(response);
+                // evento de click
+                $('.search-item-result').on('click', function () {
+                    console.log("Você clicou em: " + $(this).text());
+                    result.hide();
+                });
             }
         });
     }
 
-    // Evento de teclado
-    search.keyup(function() {
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(doSearch, doneTypingInterval);
-    });
+    $(document).ready(function () {
 
-    // Evento para cancelar a pesquisa se o usuário começar a digitar novamente antes do tempo de espera
-    search.keydown(function() {
-        clearTimeout(typingTimer);
+        // Evento de teclado
+        search.keyup(function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(doSearch, doneTypingInterval);
+        });
+
+        // Evento para cancelar a pesquisa se o usuário começar a digitar novamente antes do tempo de espera
+        search.keydown(function () {
+            clearTimeout(typingTimer);
+        });
+
+        // Evento para fechar a pesquisa quando clicado fora
+        $("main").click(function () {
+            result.hide();
+        });
     });
 
 </script>
@@ -234,22 +247,22 @@
                     borderWidth: 4,
                     pointBackgroundColor: '#007bff'
                 },
-                {
-                    data: [
-                        12339,
-                        22345,
-                        13483,
-                        21003,
-                        20489,
-                        27092,
-                        32034
-                    ],
-                    lineTension: 0,
-                    backgroundColor: 'transparent',
-                    borderColor: '#7b00ff',
-                    borderWidth: 4,
-                    pointBackgroundColor: '#7b00ff'
-                }
+                    {
+                        data: [
+                            12339,
+                            22345,
+                            13483,
+                            21003,
+                            20489,
+                            27092,
+                            32034
+                        ],
+                        lineTension: 0,
+                        backgroundColor: 'transparent',
+                        borderColor: '#7b00ff',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#7b00ff'
+                    }
                 ]
             },
             options: {
