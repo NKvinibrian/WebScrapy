@@ -139,3 +139,12 @@ class AjaxPesquisaView(View):
         request_filter = request.GET.get('search')
         context = bo_search.SearchProduct.search_ean_product(request_filter)
         return JsonResponse(context, safe=False)
+
+
+class AjaxGetProdutoGraph(View):
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        ean = request.GET.get('ean')
+        context = bo_produto.Produto(ean=ean).get_product_2_graph()
+        return JsonResponse(context, safe=False)

@@ -11,6 +11,7 @@ urlpatterns = [
     path('ajax-produtos', AjaxProdutosView.as_view(), name='ajax_produtos'),
 
     path('pesquisa', AjaxPesquisaView.as_view(), name='ajax_pesquisa'),
+    path('produto-graph', AjaxGetProdutoGraph.as_view(), name='ajax_produto_graph'),
 
     path('', DashboardView.as_view(), name='dashboard')
 ]
