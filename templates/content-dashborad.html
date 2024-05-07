@@ -34,118 +34,10 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-    let search = $("#search_field")
-    let result = $("#search_result")
-    let tableProduct = $("#table-product")
-
-    listProduct = []
-    result.hide()
-
-    let typingTimer;
-    let doneTypingInterval = 500; // Tempo em milissegundos (0.5 segundos)
-
-    // Função para realizar a pesquisa
-    function doSearch() {
-        // Pega o valor digitado no campo de pesquisa
-        let query = search.val();
-
-        // Realiza a pesquisa somente se houver texto digitado
-        if (query.trim() !== '') {
-            // Aqui você pode realizar uma solicitação AJAX para o seu servidor para obter os resultados do banco de dados
-            // Por enquanto, vamos apenas exibir a consulta digitada
-            result.empty()
-            searchAjax();
-            result.show();
-        } else {
-            // Se o campo de pesquisa estiver vazio, limpe os resultados
-            result.empty();
-            result.hide();
-        }
-    }
-
-    function searchAjax() {
-        $.ajax({
-            url: "{% url 'ajax_pesquisa' %}",
-            type: "GET",
-            data: {search: search.val()},
-            success: function (response) {
-                response.forEach(
-                    data => result.append(`
-                        <li class="search-item-result">
-                            <a class="dropdown-item" >${data.ean} - ${data.name}</a>
-                            <input type="hidden" value="${data.ean}">
-                        </li>
-                    `)
-                );
-                // evento de click
-                $('.search-item-result').on('click', function () {
-                    let ean = $(this).children('input').val();
-                    getProductGraphAjax(ean)
-                    result.hide();
-                });
-            }
-        });
-    }
-
-
-    function getProductGraphAjax(ean){
-        $.ajax({
-            url: "{% url 'ajax_produto_graph' %}",
-            type: "GET",
-            data: {ean: ean},
-            success: function (response) {
-                listProduct.push(response);
-                let fn = function(data){
-                    tableProduct.append(`
-                    <tr>
-                        <td>${data.id}</td>
-                        <td>${data.seller}</td>
-                        <td>${data.ean}</td>
-                        <td>${data.name}</td>
-                        <td>${data.value}</td>
-                        <td>${data.data_in}</td>
-                    </tr>
-                    `)
-                }
-
-                response['client'].forEach(fn);
-                response['sellers'].forEach(fn);
-            }
-        })
-    }
-
-
-    $(document).ready(function () {
-
-        // Evento de teclado
-        search.keyup(function () {
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(doSearch, doneTypingInterval);
-        });
-
-        // Evento para cancelar a pesquisa se o usuário começar a digitar novamente antes do tempo de espera
-        search.keydown(function () {
-            clearTimeout(typingTimer);
-        });
-
-        // Evento para fechar a pesquisa quando clicado fora
-        $("main").click(function () {
-            result.hide();
-        });
-    });
-
-</script>
-
-
-<script>
-    (function () {
-        'use strict'
-
+    function InitGraph() {
         feather.replace()
 
-        // Graphs
         var ctx = document.getElementById('myChart')
-        // eslint-disable-next-line no-unused-vars
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -205,6 +97,136 @@
                 }
             }
         })
-    }())
+        return myChart;
+    }
+
+</script>
+
+<script>
+    let search = $("#search_field")
+    let result = $("#search_result")
+    let tableProduct = $("#table-product")
+    let graphic = null;
+
+    result.hide()
+
+    let typingTimer;
+    let doneTypingInterval = 500; // Tempo em milissegundos (0.5 segundos)
+
+    // Função para realizar a pesquisa
+    function doSearch() {
+        // Pega o valor digitado no campo de pesquisa
+        let query = search.val();
+
+        // Realiza a pesquisa somente se houver texto digitado
+        if (query.trim() !== '') {
+            // Aqui você pode realizar uma solicitação AJAX para o seu servidor para obter os resultados do banco de dados
+            // Por enquanto, vamos apenas exibir a consulta digitada
+            result.empty()
+            searchAjax();
+            result.show();
+        } else {
+            // Se o campo de pesquisa estiver vazio, limpe os resultados
+            result.empty();
+            result.hide();
+        }
+    }
+
+    function searchAjax() {
+        $.ajax({
+            url: "{% url 'ajax_pesquisa' %}",
+            type: "GET",
+            data: {search: search.val()},
+            success: function (response) {
+                response.forEach(
+                    data => result.append(`
+                        <li class="search-item-result">
+                            <a class="dropdown-item" >${data.ean} - ${data.name}</a>
+                            <input type="hidden" value="${data.ean}">
+                        </li>
+                    `)
+                );
+                // evento de click
+                $('.search-item-result').on('click', function () {
+                    let ean = $(this).children('input').val();
+                    getProductGraphAjax(ean)
+                    result.hide();
+                });
+            }
+        });
+    }
+
+
+    function getProductGraphAjax(ean){
+        $.ajax({
+            url: "{% url 'ajax_produto_graph' %}",
+            type: "GET",
+            data: {ean: ean},
+            success: function (response) {
+                let fn = function(data){
+                    tableProduct.append(`
+                    <tr>
+                        <td>${data.id}</td>
+                        <td>${data.seller}</td>
+                        <td>${data.ean}</td>
+                        <td>${data.name}</td>
+                        <td>${data.value}</td>
+                        <td>${data.data_in}</td>
+                    </tr>
+                    `)
+//                    insertInGraph(response)
+                }
+
+                response['client'].forEach(fn);
+                response['sellers'].forEach(fn);
+            }
+        })
+    }
+// todo: parei aqui
+//    function insertInGraph(data){
+//        let listDate = new Set();
+//        let sellerDict = {}
+//        let tratarDate = function(data) {
+//            let d = new Date(data['data_in'])
+//            let format = `${d.getDay()}/${d.getMonth()}/${d.getFullYear()}`
+//            listDate.add(format)
+//
+//            if (sellerDict[data['seller']] == null){
+//                sellerDict[data['seller']] = {}
+//            }
+//
+//
+//
+//        }
+//        data['client'].forEach(tratarData);
+//        data['sellers'].forEach(tratarData);
+//
+//        let
+//
+//        graphic
+//    }
+
+
+    $(document).ready(function () {
+
+        // Evento de teclado
+        search.keyup(function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(doSearch, doneTypingInterval);
+        });
+
+        // Evento para cancelar a pesquisa se o usuário começar a digitar novamente antes do tempo de espera
+        search.keydown(function () {
+            clearTimeout(typingTimer);
+        });
+
+        // Evento para fechar a pesquisa quando clicado fora
+        $("main").click(function () {
+            result.hide();
+        });
+
+        graphic = InitGraph();
+
+    });
 
 </script>
