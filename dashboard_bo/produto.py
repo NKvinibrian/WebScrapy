@@ -90,6 +90,7 @@ class Produto:
 
     def get_product_2_graph(self) -> dict:
         result = {
+            'allSellers': {'cliente'},
             'client': [],
             'sellers': []
         }
@@ -100,13 +101,13 @@ class Produto:
         query_our_prd = f"""
         SELECT pd.ean, pd.id, pd.name, pd.value, pd.date_in
         FROM produtos AS pd
-        WHERE pd.status and pd.ean = {self.ean};
+        WHERE pd.status and pd.ean = {self.ean} order by pd.date_in;
         """
 
         query_seller_prd = f"""
         SELECT pd.ean, pd.id, pd.name, pd.value, pd.date_in, pd.seller
         FROM scraped_produtos AS pd
-        WHERE pd.status and pd.ean = {self.ean};
+        WHERE pd.status and pd.ean = {self.ean} order by pd.date_in;
         """
 
         def new_dict(data: tuple, seller: str = None) -> dict:
@@ -129,5 +130,7 @@ class Produto:
             rows: tuple = cursor.fetchall()
             for row in rows:
                 result['sellers'].append(new_dict(row))
+                result['allSellers'].add(row[5])
 
+        result['allSellers'] = list(result['allSellers'])
         return result

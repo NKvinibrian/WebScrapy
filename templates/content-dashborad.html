@@ -42,23 +42,10 @@
             type: 'line',
             data: {
                 labels: [
-                    'Sunday',
-                    'Monday',
-                    'Tuesday',
-                    'Wednesday',
-                    'Thursday',
-                    'Friday',
-                    'Saturday'
                 ],
                 datasets: [{
+                    label: 'cliente',
                     data: [
-                        15339,
-                        21345,
-                        18483,
-                        24003,
-                        23489,
-                        24092,
-                        12034
                     ],
                     lineTension: 0,
                     backgroundColor: 'transparent',
@@ -66,22 +53,6 @@
                     borderWidth: 4,
                     pointBackgroundColor: '#007bff'
                 },
-                    {
-                        data: [
-                            12339,
-                            22345,
-                            13483,
-                            21003,
-                            20489,
-                            27092,
-                            32034
-                        ],
-                        lineTension: 0,
-                        backgroundColor: 'transparent',
-                        borderColor: '#7b00ff',
-                        borderWidth: 4,
-                        pointBackgroundColor: '#7b00ff'
-                    }
                 ]
             },
             options: {
@@ -151,19 +122,20 @@
                     let ean = $(this).children('input').val();
                     getProductGraphAjax(ean)
                     result.hide();
+                    tableProduct.empty();
                 });
             }
         });
     }
 
 
-    function getProductGraphAjax(ean){
+    function getProductGraphAjax(ean) {
         $.ajax({
             url: "{% url 'ajax_produto_graph' %}",
             type: "GET",
             data: {ean: ean},
             success: function (response) {
-                let fn = function(data){
+                let fn = function (data) {
                     tableProduct.append(`
                     <tr>
                         <td>${data.id}</td>
@@ -174,38 +146,99 @@
                         <td>${data.data_in}</td>
                     </tr>
                     `)
-//                    insertInGraph(response)
-                }
 
+                }
                 response['client'].forEach(fn);
                 response['sellers'].forEach(fn);
+                insertInGraph(response)
             }
         })
     }
-// todo: parei aqui
-//    function insertInGraph(data){
-//        let listDate = new Set();
-//        let sellerDict = {}
-//        let tratarDate = function(data) {
-//            let d = new Date(data['data_in'])
-//            let format = `${d.getDay()}/${d.getMonth()}/${d.getFullYear()}`
-//            listDate.add(format)
-//
-//            if (sellerDict[data['seller']] == null){
-//                sellerDict[data['seller']] = {}
-//            }
-//
-//
-//
-//        }
-//        data['client'].forEach(tratarData);
-//        data['sellers'].forEach(tratarData);
-//
-//        let
-//
-//        graphic
-//    }
 
+    function insertInGraph(data) {
+        let dataDict = {};
+
+        let tratarData = function (dataSeller) {
+            let d = new Date(dataSeller['data_in']);
+
+            if (dataDict[d.getFullYear()] == null) {
+                dataDict[d.getFullYear()] = {};
+            }
+            let month = d.getMonth() + 1;
+            if (dataDict[d.getFullYear()][month] == null) {
+                dataDict[d.getFullYear()][month] = {};
+            }
+
+            let day = d.getDate();
+            if (dataDict[d.getFullYear()][month][day] == null) {
+                dataDict[d.getFullYear()][month][day] = {};
+            }
+
+            if (dataDict[d.getFullYear()][month][day][dataSeller.seller] == null) {
+                data['allSellers'].forEach(seller => dataDict[d.getFullYear()][month][day][seller] = 0);
+                dataDict[d.getFullYear()][month][day][dataSeller.seller] = dataSeller.value;
+            }
+
+        }
+        data['client'].forEach(tratarData);
+        data['sellers'].forEach(tratarData);
+
+        let dataSets = {}
+        data['allSellers'].forEach(seller => dataSets[seller] = {
+            label: seller,
+            data: [],
+            lineTension: 0,
+            backgroundColor: 'transparent',
+            borderColor: '#' + Math.floor(Math.random() * 16777215).toString(16),
+            borderWidth: 4,
+            pointBackgroundColor: this.borderColor
+        });
+
+        let label = new Set();
+        for (const [key, value] of Object.entries(dataDict)) {
+            for (const [key1, value1] of Object.entries(value)) {
+                for (const [key2, value2] of Object.entries(value1)) {
+                    label.add(`${key2}/${key1}/${key}`);
+                    for (const [key3, value3] of Object.entries(value2)) {
+                        dataSets[key3]['data'].push(value3);
+                    }
+                }
+            }
+        }
+
+        graphic.data.datasets = []
+
+        for (const [key, value] of Object.entries(dataSets)) {
+            let alt = false;
+            let listAIndic = [];
+            let listBIndic = [];
+            let lastValue = 0;
+            let firstValue = 0;
+            let count = 0;
+            let fn = function (v) {
+                if (v === 0 && alt === false) {
+                    listAIndic.push(count);
+                } else if (v === 0) {
+                    alt = true;
+                    listBIndic.push(count);
+                } else {
+                    if (firstValue === 0){
+                        firstValue = v;
+                    }
+                    alt = true;
+                    lastValue = v;
+                }
+                listAIndic.forEach(i => value.data[i] = firstValue);
+                listBIndic.forEach(i => value.data[i] = lastValue);
+                count += 1;
+            }
+            value.data.forEach(fn);
+            graphic.data.datasets.push(value);
+        }
+        graphic.data.labels = Array.from(label);
+        graphic.update();
+        console.log(dataSets);
+    }
 
     $(document).ready(function () {
 
