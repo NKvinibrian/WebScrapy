@@ -5,6 +5,7 @@ from datetime import datetime
 
 from typing import Union
 
+
 class Produto:
 
     def __init__(self, product_id: int = None, ean: int = None):

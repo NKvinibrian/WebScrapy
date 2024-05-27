@@ -2,9 +2,12 @@ import copy
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views import View
+
 import dashboard_bo.login_control as bo_login
 import dashboard_bo.produto as bo_produto
 import dashboard_bo.search as bo_search
+import dashboard_bo.sellers as bo_sellers
+
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -147,4 +150,12 @@ class AjaxGetProdutoGraph(View):
     def get(self, request, *args, **kwargs):
         ean = request.GET.get('ean')
         context = bo_produto.Produto(ean=ean).get_product_2_graph()
+        return JsonResponse(context, safe=False)
+
+
+class AjaxGetAllSellers(View):
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        context = bo_sellers.Seller.get_all_sellers()
         return JsonResponse(context, safe=False)

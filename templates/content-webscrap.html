@@ -1,22 +1,70 @@
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Abrir modal
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Título do modal</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Conteúdo do modal...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-        <!-- Você pode adicionar mais botões aqui, se necessário -->
-      </div>
-    </div>
-  </div>
+<div class="d-flex mx-auto p-2 justify-content-center" style="width: 90%">
+    <form class="d-flex form-inline my-2 my-lg-2 flex-row" style="width: 400px">
+        <input class="form-control mr-4 mx-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
+    </form>
 </div>
+<div class="table-responsive px-4">
+    <table class="table table-striped table-bordered table-sm">
+        <thead>
+        <tr class="table-dark">
+            <th>
+                <div class="d-flex justify-content-center">Id</div>
+            </th>
+            <th>
+                <div class="d-flex justify-content-center">Nome</div>
+            </th>
+            <th>
+                <div class="d-flex justify-content-center">Ultima atualização</div>
+            </th>
+            <th>
+                <div class="d-flex justify-content-center">Ação</div>
+            </th>
+        </tr>
+        </thead>
+        <tbody id="tabelaSellers" class="table align-items-center">
+        </tbody>
+    </table>
+</div>
+{% csrf_token %}
+
+<script>
+    function loadData() {
+        $.ajax({
+            url: "{% url 'ajax_web_scrap' %}",
+            type: "GET",
+            success: function (response) {
+                let element = $('#tabelaSellers');
+                element.empty();
+                let html = ''
+                response.forEach(function (item) {
+                    let formatDate = item.update ? moment(item.update).format('DD/MM/YYYY HH:mm:ss') : '';
+
+                    html += `<tr>
+                    <td><div class="d-flex justify-content-center">${item.id}</div></td>
+                    <td><div class="d-flex justify-content-center">${item.name}</div></td>
+                    <td><div class="d-flex justify-content-center">${formatDate}</div></td>
+
+                    <td>
+                    <div class="d-flex justify-content-center">
+                    <button type="button" class="d-flex btn btn-primary mx-1 px-3 align-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-circle" viewBox="0 0 16 16">
+  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+  <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445"/>
+</svg>
+                    </button>
+                    </div>
+                    </td></tr>`;
+                })
+                element.append(html)
+            }
+        });
+    }
+
+    function reload(event) {
+        loadData();
+    }
+
+    $(document).ready(function () {
+        loadData();
+    })
+</script>

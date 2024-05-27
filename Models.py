@@ -30,3 +30,8 @@ class ScrapedProdutos(Base, BaseModels):
     name = Column(String)
     ean = Column(Integer)
     value = Column(Float, default=0)
+
+
+class Sellers(Base, BaseModels):
+    __tablename__ = 'sellers'
+    name = Column(String)

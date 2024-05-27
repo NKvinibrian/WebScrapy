@@ -1,7 +1,6 @@
 from SiteMapScraping import WebScrap
 import re
 import asyncio
-import requests
 import aiohttp
 import datetime
 
@@ -31,7 +30,7 @@ class Nissei(WebScrap):
             async with session.post(url, data=form_data, cookies=cookies, headers=headers) as response:
                 return await response.text()
 
-    async def pegar_preco(self, codigo):
+    async def get_price(self, codigo):
         url = self.url + '/pegar/preco'
         cookies = await self.get_cookies(self.url)
 
@@ -84,7 +83,7 @@ class Nissei(WebScrap):
         result = result[0] if result else None
         codigo = result
         if codigo:
-            data['value'] = await self.pegar_preco(codigo)
+            data['value'] = await self.get_price(codigo)
 
         result = response.strip().replace('\n', '').replace('\r', '')
         pattern = r'<h1 data-target=\"nome_produto\" style=\"font-size: 25px !important;\" class=\"font-weight-bold text-extradark-grey\">(.*?)</h1>'
@@ -110,5 +109,3 @@ class Nissei(WebScrap):
         asyncio.run(self.__asyc_run())
         print('Finalizado em {}'.format(datetime.datetime.now()))
         print('Total de tempo {}'.format(datetime.datetime.now() - dat_init))
-
-

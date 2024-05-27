@@ -8,6 +8,7 @@ urlpatterns = [
     path('logoff', LogoffView.as_view(), name='logoff'),
 
     path('web-scrap', WebScrapView.as_view(), name='web_scrap'),
+    path('ajax-web-scrap', AjaxGetAllSellers.as_view(), name='ajax_web_scrap'),
 
     path('produtos', ProdutoView.as_view(), name='produtos'),
     path('ajax-produtos', AjaxProdutosView.as_view(), name='ajax_produtos'),
