@@ -1,4 +1,6 @@
 import copy
+import json
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views import View
@@ -132,6 +134,23 @@ class AjaxProdutosView(View):
         content = copy.deepcopy(request.POST)
         del content['csrfmiddlewaretoken']
         bo_produto.Produto().set_product(content)
+        return JsonResponse('', safe=False)
+
+
+class AjaxProductHistoric(View):
+
+    def get(self, request, *args, **kwargs):
+        ean = kwargs['ean']
+        context = bo_produto.Produto(ean=ean).get_all_product_historic()
+        return JsonResponse(context, safe=False)
+
+
+class AjaxProductEditHistoric(View):
+
+    @csrf_exempt
+    def post(self, request, *args, **kwargs):
+        body = json.loads(request.body)
+        bo_produto.Produto.edit_product_historic(body['data'])
         return JsonResponse('', safe=False)
 
 

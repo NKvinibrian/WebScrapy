@@ -3,7 +3,7 @@ from builtins import staticmethod
 from django.db import connection
 from datetime import datetime
 
-from typing import Union
+from typing import Union, List
 
 
 class Produto:
@@ -135,3 +135,47 @@ class Produto:
 
         result['allSellers'] = list(result['allSellers'])
         return result
+
+    def get_all_product_historic(self) -> List[dict]:
+        assert self.ean is not None
+        ean = int(self.ean)
+
+        query = f"""
+        select id, ean, name, value, date_in from produtos
+        where ean = {ean} order by date_in desc;
+        """
+        list_historic = []
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            rows: tuple = cursor.fetchall()
+            for item in rows:
+                list_historic.append({
+                    'id': item[0],
+                    'ean': item[1],
+                    'name': item[2],
+                    'value': item[3],
+                    'date_in': str(item[4]) if item[4] else None
+                })
+        return list_historic
+
+    @staticmethod
+    def edit_product_historic(data):
+        values = ''
+        for item in data:
+            values += f"({item['id']}, {item['valor']}),"
+
+        if len(values) > 0:
+            values = values[:len(values)-1]
+
+        with connection.cursor() as cursor:
+            sql = f"""
+                WITH updates (id, value) AS (
+                    VALUES
+                        {values}
+                )
+                UPDATE produtos
+                SET value = updates.value
+                FROM updates
+                WHERE produtos.id = updates.id;
+            """
+            cursor.execute(sql)
