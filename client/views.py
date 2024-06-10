@@ -153,6 +153,12 @@ class AjaxProductEditHistoric(View):
         bo_produto.Produto.edit_product_historic(body['data'])
         return JsonResponse('', safe=False)
 
+    @csrf_exempt
+    def delete(self, request, *args, **kwargs):
+        body = json.loads(request.body)
+        bo_produto.Produto.delete_product_historic(body['data'])
+        return JsonResponse('', safe=False)
+
 
 class AjaxPesquisaView(View):
 

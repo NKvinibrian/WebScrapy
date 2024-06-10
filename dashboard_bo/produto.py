@@ -179,3 +179,18 @@ class Produto:
                 WHERE produtos.id = updates.id;
             """
             cursor.execute(sql)
+
+    @staticmethod
+    def delete_product_historic(ids: list):
+        new_list = []
+        for i in ids:
+            new_list.append(str(i))
+
+        with connection.cursor() as cursor:
+            placeholder = ', '.join(['%s'] * len(new_list))
+            sql = f"""
+                update produtos
+                set status = false
+                where id in ({placeholder});
+            """
+            cursor.execute(sql, new_list)

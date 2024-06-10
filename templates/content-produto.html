@@ -101,6 +101,50 @@
     </div>
 </div>
 
+{# Modal de deletar #}
+<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel3">Deletar produto</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="table-responsive p-4">
+                <table class="table table-striped table-bordered table-sm">
+                    <thead>
+                    <tr class="table-dark">
+                        <th>
+                            <div class="d-flex justify-content-center">Id</div>
+                        </th>
+                        <th>
+                            <div class="d-flex justify-content-center">Nome</div>
+                        </th>
+                        <th>
+                            <div class="d-flex justify-content-center">Ean</div>
+                        </th>
+                        <th>
+                            <div class="d-flex justify-content-center">Valor</div>
+                        </th>
+                        <th>
+                            <div class="d-flex justify-content-center">Data</div>
+                        </th>
+                        <th>
+                            <div class="d-flex justify-content-center">Ação</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabelaProdutosDeletar" class="table align-items-center">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button id="btn-submit-deletar" type="button" class="btn btn-danger">Deletar todos</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% csrf_token %}
 
 <script>
@@ -136,7 +180,7 @@
                                   d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
                         </svg>
                     </button>
-                    <button id="ButtonDelete" type="button" class="d-flex btn btn-danger mx-1 px-3 align-items-center" value="${item.ean}">
+                    <button id="ButtonDelete" type="button" class="d-flex btn btn-danger mx-1 px-3 align-items-center" data-bs-toggle="modal" data-bs-target="#exampleModal3" value="${item.ean}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              class="bi bi-trash"
                              viewBox="0 0 16 16">
@@ -151,6 +195,10 @@
                 $("*#ButtonEdit").click(function () {
                     let ean = $(this).val();
                     loadDataHistoric(ean);
+                });
+                $("*#ButtonDelete").click(function () {
+                    let ean = $(this).val();
+                    loadDataHistoricDelete(ean);
                 });
             }
         });
@@ -211,6 +259,51 @@
         })
     }
 
+    function loadDataHistoricDelete(ean) {
+        $.ajax({
+            url: "{% url 'ajax_produtos_historic' '0' %}".replace('0', ean),
+            type: "GET",
+            data: {
+                csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val()
+            },
+            success: function (response) {
+                let Component = $("#tabelaProdutosDeletar");
+                Component.empty();
+                let html = '';
+                response.forEach(function (item) {
+                    let formatDate = item.date_in ? moment(item.date_in).format('DD/MM/YYYY HH:mm:ss') : '';
+                    let formatValue = item.value ? item.value.toLocaleString('pt-br', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }) : '00,00 R$';
+                    html += `<tr>
+                    <td><div class="d-flex justify-content-center">${item.id}</div></td>
+                    <td><div class="d-flex justify-content-center">${item.name}</div></td>
+                    <td><div class="d-flex justify-content-center">${item.ean}</div></td>
+                    <td><div class="d-flex justify-content-center">${formatValue}</div></td>
+                    <td><div class="d-flex justify-content-center">${formatDate}</div></td>
+
+                    <td>
+                    <div class="d-flex justify-content-center">
+                    <button id="ButtonDelete" type="button" class="d-flex btn btn-danger mx-1 px-3 align-items-center" data-bs-toggle="modal" data-bs-target="#exampleModal3" value="${item.ean}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-trash"
+                             viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                        </svg>
+                    </button>
+                    </div>
+                    </td></tr>`;
+                    Component.append(html);
+                })
+            },
+            error: function () {
+                console.error("Erro ao tentar pegar historico")
+            }
+        })
+    }
+
     $(document).ready(function () {
         loadData();
         $('#reload-btn').click(reload);
@@ -239,7 +332,7 @@
                 }
             });
         });
-        $('#btn-submit-editar').click(function (){
+        $('#btn-submit-editar').click(function () {
             let allHistoricForm = $("*#produto-form-editar");
             let serializeData = {
                 csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
@@ -248,7 +341,9 @@
             allHistoricForm.each(function () {
                 let content = $(this).serializeArray();
                 let data = {};
-                content.forEach(function (field){data[field.name] = field.value});
+                content.forEach(function (field) {
+                    data[field.name] = field.value
+                });
                 serializeData.data.push(data)
             });
             console.log(serializeData)
