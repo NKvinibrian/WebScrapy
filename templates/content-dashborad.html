@@ -177,9 +177,13 @@
 
                 let acc = $('#accordionFlushExample');
                 acc.empty();
-                acc.append(contructTable(response['client'], '1'));
-                acc.append(contructTable(response['sellers'], '2'));
-
+                {# Todo: Verificar se arrumou o erro do produto 10006197 #}
+                if (response['client'].length) {
+                    acc.append(contructTable(response['client'], '1'));
+                }
+                if (response['sellers'].length) {
+                    acc.append(contructTable(response['sellers'], '2'));
+                }
 
                 insertInGraph(response)
             }

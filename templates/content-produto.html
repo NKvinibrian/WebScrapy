@@ -285,7 +285,7 @@
 
                     <td>
                     <div class="d-flex justify-content-center">
-                    <button id="ButtonDelete" type="button" class="d-flex btn btn-danger mx-1 px-3 align-items-center" data-bs-toggle="modal" data-bs-target="#exampleModal3" value="${item.ean}">
+                    <button id="ButtonDeleteHistoricModal" type="button" class="d-flex btn btn-danger mx-1 px-3 align-items-center" data-bs-toggle="modal" data-bs-target="#exampleModal3" value="${item.id}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              class="bi bi-trash"
                              viewBox="0 0 16 16">
@@ -302,6 +302,10 @@
                 console.error("Erro ao tentar pegar historico")
             }
         })
+    }
+
+    function deleteHistoric(ean) {
+
     }
 
     $(document).ready(function () {
